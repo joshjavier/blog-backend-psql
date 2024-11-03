@@ -23,11 +23,31 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+const blogFinder = async (req, res, next) => {
+  req.blog = await Blog.findByPk(req.params.id)
+  next()
+}
+
+router.delete('/:id', blogFinder, async (req, res) => {
   try {
-    const blog = await Blog.findByPk(req.params.id)
-    await blog?.destroy()
+    await req.blog?.destroy()
     res.sendStatus(204)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({ error })
+  }
+})
+
+router.put('/:id', blogFinder, async (req, res) => {
+  const { likes } = req.body
+  try {
+    if (req.blog) {
+      if (likes) req.blog.likes = likes
+      await req.blog.save()
+      res.status(200).json(req.blog)
+    } else {
+      return res.status(404).json({ error: 'Blog not found' })
+    }
   } catch (error) {
     console.log(error)
     res.status(400).send({ error })
