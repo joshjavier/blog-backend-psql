@@ -1,68 +1,18 @@
-require('dotenv').config()
-const { Sequelize, DataTypes } = require('sequelize')
 const express = require('express')
+const { PORT } = require('./util/config')
+const { connectToDatabase } = require('./util/db')
+const blogsRouter = require('./controllers/blogs')
 
-const sequelize = new Sequelize(process.env.DATABASE_URL)
 const app = express()
 app.use(express.json())
 
-const Blog = sequelize.define('blog', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  author: DataTypes.STRING,
-  url: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  likes: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
-}, {
-  timestamps: false,
-  underscored: true,
-})
+app.use('/api/blogs', blogsRouter)
 
-app.get('/api/blogs', async (req, res) => {
-  try {
-    const blogs = await Blog.findAll()
-    res.json(blogs)
-  } catch (error) {
-    console.log(error)
-    res.status(500).send({ error })
-  }
-})
+const start = async () => {
+  await connectToDatabase()
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+  })
+}
 
-app.post('/api/blogs', async (req, res) => {
-  const { author, url, title, likes } = req.body
-  try {
-    const blog = await Blog.create({ author, url, title, likes })
-    res.send(blog)
-  } catch (error) {
-    console.log(error)
-    res.status(400).send({ error })
-  }
-})
-
-app.delete('/api/blogs/:id', async (req, res) => {
-  try {
-    const blog = await Blog.findByPk(req.params.id)
-    await blog?.destroy()
-    res.sendStatus(204)
-  } catch (error) {
-    console.log(error)
-    res.status(400).send({ error })
-  }
-})
-
-const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+start()
