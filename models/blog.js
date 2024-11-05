@@ -21,7 +21,6 @@ const Blog = sequelize.define('blog', {
     defaultValue: 0,
   },
 }, {
-  timestamps: false,
   underscored: true,
 })
 
