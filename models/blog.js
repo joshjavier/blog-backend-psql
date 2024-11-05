@@ -20,6 +20,17 @@ const Blog = sequelize.define('blog', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  year: {
+    type: DataTypes.INTEGER,
+    validate: {
+      isValidYear(value) {
+        const currentYear = new Date().getFullYear()
+        if (parseInt(value) < 1991 || parseInt(value) > currentYear) {
+          throw new Error('Year must be at least 1991 up to the current year.')
+        }
+      }
+    },
+  }
 }, {
   underscored: true,
 })
