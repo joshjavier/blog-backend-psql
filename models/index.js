@@ -4,8 +4,8 @@ const User = require("./user");
 
 User.hasMany(Blog)
 Blog.belongsTo(User)
-Blog.belongsToMany(User, { through: ReadingList, as: 'readings' })
-User.belongsToMany(Blog, { through: ReadingList, as: 'users_reading' })
+Blog.belongsToMany(User, { through: ReadingList, as: 'users_reading' })
+User.belongsToMany(Blog, { through: ReadingList, as: 'readings' })
 // Blog.sync({ alter: true })
 // User.sync({ alter: true })
 
